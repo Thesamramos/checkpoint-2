@@ -77,6 +77,7 @@ async function loginUser() {
   console.log(data);
 
   if (resposta.ok) {
+    localStorage.setItem('token', data.token);
     window.location.href = '/tarefas.html';
   }
 
