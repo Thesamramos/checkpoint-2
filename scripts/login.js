@@ -73,11 +73,10 @@ async function loginUser() {
 
   const resposta = await fetch('https://todo-api.ctd.academy/v1/users/login', settings)
 
-  let data = await resposta.json();
-  console.log(data);
-
   if (resposta.ok) {
-    localStorage.setItem('token', data.token);
+    let data = await resposta.json();
+    console.log(data);
+    localStorage.setItem('token', data.jwt);
     window.location.href = '/tarefas.html';
   }
 
