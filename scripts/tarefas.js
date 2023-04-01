@@ -1,5 +1,7 @@
 const btnSubmit = document.getElementById('btn');
 const btnCloseApp = document.getElementById('closeApp');
+let tarefaInput = document.getElementById('novaTarefa');
+
 
 btnCloseApp.addEventListener('click', function (){
     window.location.href = '/index.html';
@@ -31,12 +33,16 @@ userName();
 btnSubmit.addEventListener('click', async (e) => {
     e.preventDefault();
     console.log('tarefa criada')
-    await criarTarefa();
+
+    if(tarefaInput.value.length >= 5 && tarefaInput.value.trim() != ''){
+       await criarTarefa(); 
+    } else {
+       window.alert('A tarefa tem que possuir no minimo 5 caracteres')
+    }
+    
 })
 
 async function criarTarefa() {
-
-let tarefaInput = document.getElementById('novaTarefa');
 
     let dados = {
         description: tarefaInput.value,
