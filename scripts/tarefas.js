@@ -1,4 +1,9 @@
 const btnSubmit = document.getElementById('btn');
+const btnCloseApp = document.getElementById('closeApp');
+
+btnCloseApp.addEventListener('click', function (){
+    window.location.href = '/index.html';
+})
 
 //função async para adicionar o nome de usuario no header
 async function userName() {
