@@ -10,8 +10,11 @@ const erroSenha = document.getElementById('msg-senha');
 const senha2 = document.getElementById('senha2');
 const erroSenha2 = document.getElementById('msg-senha2');
 
+//envio do formulario de cadastro
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  //validação do formulario
   if (nome.value.trim() === '') {
     erroNome.innerText = 'Insira seu nome';
     nome.classList.add('erro');
@@ -61,12 +64,14 @@ form.addEventListener('submit', async (e) => {
     senha2.classList.remove('erro');
   }
 
+  //If para enviar as informações validadas para a função
   if(nome.value.trim() !== '' && sobrenome.value.trim() !== '' && email.value.trim() !== '' && senha.value.length >= 8 && senha2.value.length >= 8 && senha.value.trim() !== '' && senha2.value.trim() !== ''){
     await registrarUser(nome.value, sobrenome.value, email.value, senha.value);
   }
   
 });
 
+//função async para registrar o novo usuario
 async function registrarUser() {
 
   let dados = {

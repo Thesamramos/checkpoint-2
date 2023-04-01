@@ -6,6 +6,7 @@ const erroSenha = document.getElementById('msg-senha');
 const btn = document.getElementById('btn');
 const formFields = document.querySelectorAll('input');
 
+//loop para liberar e desabilitar o botão
 let formIsValid = false;
 
   formFields.forEach(field => {
@@ -30,10 +31,11 @@ let formIsValid = false;
     });
   });
 
-
+//envio do formulario de login
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  //validação do formulario
   if(email.value.trim() === ''){
     erroEmail.innerText = 'Insira seu email';
     email.classList.add('erro');
@@ -53,11 +55,13 @@ form.addEventListener('submit', async (e) => {
     senha.classList.remove('erro');
   }  
 
+  //If para enviar as informações validadas para a função
   if(email.value.trim() !== '' && senha.value.length >= 8 && senha.value.trim() !== ''){
     await loginUser(email.value, senha.value);
   }
 });
 
+//função async para logar
 async function loginUser() {
   
   let dados = {
