@@ -1,9 +1,13 @@
 const btnSubmit = document.getElementById('btn');
 const btnCloseApp = document.getElementById('closeApp');
 let tarefaInput = document.getElementById('novaTarefa');
+let botaoLixo = document.querySelectorAll('.trash');
+
+userName();
 
 //botão de finalizar seção
 btnCloseApp.addEventListener('click', function (){
+    localStorage.clear();
     window.location.href = '/index.html';
 })
 
@@ -28,7 +32,7 @@ async function userName() {
     }
 }
 
-userName();
+
 
 //botão para adicionar nova tarefa e validação da tarefa
 btnSubmit.addEventListener('click', async (e) => {
@@ -36,7 +40,7 @@ btnSubmit.addEventListener('click', async (e) => {
 
     if(tarefaInput.value.length >= 5 && tarefaInput.value.trim() != ''){
         await criarTarefa(); 
-        console.log('tarefa criada')
+        console.log(`Tarefa ${tarefaInput.value} criada`);
     } else {
        window.alert('A tarefa tem que possuir no minimo 5 caracteres');
     }
@@ -66,19 +70,41 @@ async function criarTarefa() {
     console.log(data);
 
     if (resposta.ok) {
+
         let divTarefas = document.getElementById('tarefas');
         let tarefa = document.createElement('li');
         let dataTarefa = new Date();
 
         tarefa.innerHTML = `
-            <li class="tarefa">
+            <li class="tarefa" id="taks-${data.id}">
             <div class="not-done"></div>
             <div class="descricao">
             <p class="nome">${data.description}</p>
             <p class="timestamp">Criada em: ${dataTarefa.toLocaleDateString()}</p>
             </div>
+            <button class="trash" onclick="ativarLixeira('${data.id}')">
+            <img src="./assets/excluir.png" alt="lixeira">
+            </button>
             </li>
         `
         divTarefas.appendChild(tarefa);
     }
 }
+
+async function ativarLixeira(id){
+
+    let liTarefa = document.getElementById(`task-${id}`);
+    let divTarefas = document.getElementById('tarefas');
+
+    let settings = {
+        method: 'DELETE',
+        headers: {
+            "content-type": "application/json",
+            "authorization": localStorage.getItem('token')
+        }
+    }
+
+    const resposta = await fetch(`https://todo-api.ctd.academy/v1/tasks/${id}`, settings);
+    let data = await resposta.json();
+    console.log(data);
+};
