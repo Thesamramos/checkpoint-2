@@ -5,6 +5,30 @@ let botaoLixo = document.querySelectorAll('.trash');
 
 userName();
 
+for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith("tarefa-")) {
+      const tarefa = JSON.parse(localStorage.getItem(key));
+      // Adicionar a tarefa no HTML
+      let divTarefas = document.getElementById('tarefas');
+      let tarefaElement = document.createElement('li');
+      let dataTarefa = new Date(tarefa.createdAt);
+      tarefaElement.innerHTML = `
+        <li class="tarefa" id="task-${tarefa.id}">
+          <div class="not-done"></div>
+          <div class="descricao">
+            <p class="nome">${tarefa.description}</p>
+            <p class="timestamp">Criada em: ${dataTarefa.toLocaleDateString()}</p>
+          </div>
+          <button class="trash" onclick="ativarLixeira('${tarefa.id}')">
+            <img src="./assets/excluir.png" alt="lixeira">
+          </button>
+        </li>
+      `;
+      divTarefas.appendChild(tarefaElement);
+    }
+  }
+
 //botão de finalizar seção
 btnCloseApp.addEventListener('click', function (){
     localStorage.clear();
@@ -76,7 +100,7 @@ async function criarTarefa() {
         let dataTarefa = new Date();
 
         tarefa.innerHTML = `
-            <li class="tarefa" id="taks-${data.id}">
+            <li class="tarefa" id="task-${data.id}">
             <div class="not-done"></div>
             <div class="descricao">
             <p class="nome">${data.description}</p>
@@ -88,13 +112,13 @@ async function criarTarefa() {
             </li>
         `
         divTarefas.appendChild(tarefa);
+        localStorage.setItem(`tarefa-${data.id}`, JSON.stringify(data));
     }
 }
 
 async function ativarLixeira(id){
 
     let liTarefa = document.getElementById(`task-${id}`);
-    let divTarefas = document.getElementById('tarefas');
 
     let settings = {
         method: 'DELETE',
@@ -107,4 +131,10 @@ async function ativarLixeira(id){
     const resposta = await fetch(`https://todo-api.ctd.academy/v1/tasks/${id}`, settings);
     let data = await resposta.json();
     console.log(data);
+
+    if(resposta.ok){
+        liTarefa.remove();
+        localStorage.removeItem(`tarefa-${id}`);
+    }
+    
 };
