@@ -116,6 +116,7 @@ async function criarTarefa() {
     }
 }
 
+//função async para excluir tarefa
 async function ativarLixeira(id){
 
     let liTarefa = document.getElementById(`task-${id}`);
