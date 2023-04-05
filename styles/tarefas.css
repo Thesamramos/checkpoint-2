@@ -187,7 +187,7 @@ a {
   width: 100%;
 }
 
-.trash {
+.trash  {
   height: 2em;
   width: 2em;
   background-color: transparent;
@@ -199,6 +199,16 @@ a {
 
 .tarefa button:hover {
   opacity: 1;
+}
+
+.seta  {
+  height: 2em;
+  width: 2em;
+  background-color: transparent;
+  margin-left: 2em;
+  margin-right: 1em;
+  opacity: .5;
+  cursor: pointer;
 }
 /* Tarefas terminadas ----------------------------------------------------------- */
 
