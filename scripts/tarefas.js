@@ -5,17 +5,26 @@ let botaoLixo = document.querySelectorAll('.trash');
 
 userName();
 
-for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith("tarefa-")) {
-      const tarefa = JSON.parse(localStorage.getItem(key));
-      // Adicionar a tarefa no HTML
-      let divTarefas = document.getElementById('tarefas');
-      let tarefaElement = document.createElement('li');
-      let dataTarefa = new Date(tarefa.createdAt);
-      tarefaElement.innerHTML = `
-        <li class="tarefa" id="task-${tarefa.id}">
-          <div class="not-done"></div>
+//Tarefas do LocalStorage
+function carregarTarefas() {
+    const divTarefas = document.getElementById('tarefas');
+    const tarefasConcluidas = document.querySelector('.tarefas-terminadas');
+  
+    // Percorre todas as chaves do localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+  
+      // Verifica se a chave começa com "tarefa-"
+      if (key.startsWith('tarefa-')) {
+        const tarefa = JSON.parse(localStorage.getItem(key));
+        const dataTarefa = new Date(tarefa.createdAt);
+  
+        // Cria um novo elemento li para a tarefa e adiciona na lista de tarefas
+        const liTarefa = document.createElement('li');
+        liTarefa.setAttribute('id', `task-${tarefa.id}`);
+        liTarefa.classList.add('tarefa');
+        liTarefa.innerHTML = `
+          <div class="not-done" onclick="concluirTarefa('${tarefa.id}')"></div>
           <div class="descricao">
             <p class="nome">${tarefa.description}</p>
             <p class="timestamp">Criada em: ${dataTarefa.toLocaleDateString()}</p>
@@ -23,14 +32,38 @@ for (let i = 0; i < localStorage.length; i++) {
           <button class="trash" onclick="ativarLixeira('${tarefa.id}')">
             <img src="./assets/excluir.png" alt="lixeira">
           </button>
-        </li>
-      `;
-      divTarefas.appendChild(tarefaElement);
+        `;
+        divTarefas.appendChild(liTarefa);
+      }
+  
+      // Verifica se a chave começa com "tarefa-concluida-"
+      if (key.startsWith('concluida-')) {
+        const tarefa = JSON.parse(localStorage.getItem(key));
+        const dataTarefa = new Date(tarefa.createdAt);
+  
+        // Cria um novo elemento li para a tarefa concluída e adiciona na lista de tarefas concluídas
+        const liTarefa = document.createElement('li');
+        liTarefa.setAttribute('id', `task-${tarefa.id}`);
+        liTarefa.classList.add('tarefa');
+        liTarefa.innerHTML = `
+          <div class="descricao">
+            <p class="nome">${tarefa.description}</p>
+            <p class="timestamp">Concluída em: ${dataTarefa.toLocaleDateString()}</p>
+          </div>
+          <button class="trash" onclick="ativarLixeira('${tarefa.id}')">
+            <img src="./assets/excluir.png" alt="lixeira">
+          </button>
+        `;
+        tarefasConcluidas.appendChild(liTarefa);
+      }
     }
   }
+  
+  // Chama a função para carregar as tarefas no início do código
+  carregarTarefas();
 
 //botão de finalizar seção
-btnCloseApp.addEventListener('click', function (){
+btnCloseApp.addEventListener('click', function () {
     localStorage.clear();
     window.location.href = '/index.html';
 })
@@ -62,13 +95,13 @@ async function userName() {
 btnSubmit.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    if(tarefaInput.value.length >= 5 && tarefaInput.value.trim() != ''){
-        await criarTarefa(); 
+    if (tarefaInput.value.length >= 5 && tarefaInput.value.trim() != '') {
+        await criarTarefa();
         console.log(`Tarefa ${tarefaInput.value} criada`);
     } else {
-       window.alert('A tarefa tem que possuir no minimo 5 caracteres');
+        window.alert('A tarefa tem que possuir no minimo 5 caracteres');
     }
-    
+
 })
 
 //função async para criar uma nova tarefa
@@ -101,7 +134,7 @@ async function criarTarefa() {
 
         tarefa.innerHTML = `
             <li class="tarefa" id="task-${data.id}">
-            <div class="not-done"></div>
+            <div class="not-done" onclick="concluirTarefa('${data.id}')"></div>
             <div class="descricao">
             <p class="nome">${data.description}</p>
             <p class="timestamp">Criada em: ${dataTarefa.toLocaleDateString()}</p>
@@ -117,7 +150,7 @@ async function criarTarefa() {
 }
 
 //função async para excluir tarefa
-async function ativarLixeira(id){
+async function ativarLixeira(id) {
 
     let liTarefa = document.getElementById(`task-${id}`);
 
@@ -133,9 +166,56 @@ async function ativarLixeira(id){
     let data = await resposta.json();
     console.log(data);
 
-    if(resposta.ok){
+    if (resposta.ok) {
         liTarefa.remove();
         localStorage.removeItem(`tarefa-${id}`);
     }
-    
+
+    if(resposta.ok){
+        localStorage.removeItem(`concluida-${id}`);
+    }
+
+};
+
+//função async para marcar como concluida a tarefa
+async function concluirTarefa(id) {
+
+    let liTarefa = document.getElementById(`task-${id}`);
+
+    let settings = {
+        method: 'PUT',
+        headers: {
+            "content-type": "application/json",
+            "authorization": localStorage.getItem('token')
+        },
+        body: JSON.stringify({ "completed": true })
+    }
+    const resposta = await fetch(`https://todo-api.ctd.academy/v1/tasks/${id}`, settings);
+    let data = await resposta.json();
+    console.log(data);
+
+    liTarefa.remove();
+    localStorage.removeItem(`tarefa-${id}`);
+    if (resposta.ok) {
+
+        let tarefaTerminada = document.createElement('div');
+        let tarefasTerminadas = document.querySelector('.tarefas-terminadas');
+        let dataTarefaTerminada = new Date();
+
+        tarefaTerminada.innerHTML = ` 
+        <li class="tarefa" id="task-${data.id}">
+        <div class="descricao">
+        <p class="nome">${data.description}</p>
+        <p class="timestamp">Concluida em: ${dataTarefaTerminada.toLocaleDateString()}</p>
+        </div>
+        <button class="trash" onclick="ativarLixeira('${data.id}')">
+        <img src="./assets/excluir.png" alt="lixeira">
+        </button>
+        </li>
+    `
+        tarefasTerminadas.appendChild(tarefaTerminada);
+        localStorage.setItem(`concluida-${id}`, JSON.stringify(data));
+    }
+
+
 };
