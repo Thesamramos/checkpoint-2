@@ -258,4 +258,5 @@ async function voltarTarefa(id) {
         divTarefas.appendChild(tarefa);
         localStorage.setItem(`tarefa-${data.id}`, JSON.stringify(data));
     }
+
 };

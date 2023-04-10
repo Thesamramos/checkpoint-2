@@ -1,3 +1,4 @@
+
 const form = document.getElementById('form');
 const email = document.getElementById('inputEmail');
 const erroEmail = document.getElementById('msg-email');
@@ -75,15 +76,21 @@ async function loginUser() {
     body: JSON.stringify(dados)
   }
 
-  const resposta = await fetch('https://todo-api.ctd.academy/v1/users/login', settings)
-
-  if (resposta.ok) {
-    let data = await resposta.json();
-    console.log(data);
-    localStorage.setItem('token', data.jwt);
-    window.location.href = '/tarefas.html';
-  }
-
+    const resposta = await fetch('https://todo-api.ctd.academy/v1/users/login', settings);
+    if (resposta.ok) {
+      let data = await resposta.json();
+      console.log(data);
+      localStorage.setItem('token', data.jwt);
+      window.location.href = '/tarefas.html';
+    }else {
+      if(resposta.status == 404){
+        alert('ERRO O USUARIO NÃO EXISTE');
+      } else if(resposta.status == 400){
+        alert('ERRO SENHA INCORRETA');
+      } else {
+        alert('ERRO NO SERVIDOR, TENTE MAIS TARDE');
+      }
+    }
 }
 
 function isValidEmail(email) {

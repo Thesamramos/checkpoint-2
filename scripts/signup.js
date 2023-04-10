@@ -96,6 +96,12 @@ async function registrarUser() {
 
   if (resposta.ok) {
     window.location.href = '/index.html';
+  }else {
+    if(resposta.status == 400){
+      alert('ERRO O USUARIO JÁ EXISTE');
+    } else {
+      alert('ERRO NO SERVIDOR, TENTE MAIS TARDE');
+    }
   }
 }
 
